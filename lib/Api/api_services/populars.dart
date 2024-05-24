@@ -22,7 +22,6 @@ class Populars{
         }
       }
       result['popular'] = popularList;
-      print(result);
       return result;
     }catch(e){
       result['message'] = e;
