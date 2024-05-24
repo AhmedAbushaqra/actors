@@ -3,15 +3,18 @@ import 'package:flutter/material.dart';
 
 class PopularWidget extends StatelessWidget {
   final PopularModel popular;
+  final Color? color;
 
   const PopularWidget({super.key,
-    required this.popular
+    required this.popular,
+    this.color,
   });
 
   @override
   Widget build(BuildContext context) {
     return Card(
       elevation: 0,
+      color: color ?? Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15), // Rounded corners
         side: BorderSide(
