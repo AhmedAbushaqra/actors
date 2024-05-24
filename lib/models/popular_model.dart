@@ -14,7 +14,7 @@ class PopularModel {
     gender = json['gender'];
     image = json['profile_path'];
     profession = json['known_for_department'];
-    works = (json['known_for']).map((work) => KnownFor.fromJson(work)).toList();
+    works = (json['known_for']).map<KnownFor>((work) => KnownFor.fromJson(work)).toList();
   }
 
   Map<String, dynamic> toJson() {

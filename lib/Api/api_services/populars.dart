@@ -12,7 +12,7 @@ class Populars{
     List<dynamic> popularRequests = [];
     Map<String,dynamic> result = {};
 
-    if (data['status']=='success') {
+    try{
       if (data.containsKey('results')) {
         popularRequests = data['results'];
         for (int i = 0; i < popularRequests.length; i++) {
@@ -21,9 +21,13 @@ class Populars{
           );
         }
       }
+      result['popular'] = popularList;
+      print(result);
+      return result;
+    }catch(e){
+      result['message'] = e;
+      return result;
     }
-    print(result);
-    result['popular'] = popularList;
-    return result;
+
   }
 }
