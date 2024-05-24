@@ -1,3 +1,4 @@
+import 'package:actors/Api/api_services/populars.dart';
 import 'package:actors/models/popular_model.dart';
 import 'package:flutter/material.dart';
 import 'widgets/popular_widget.dart';
@@ -79,7 +80,29 @@ class _PopularScreenState extends State<PopularScreen> {
         pageNumber = 1;
       });
     }
-    /*  */
+    try{
+      var response =  await Populars().get(page: pageNumber);
+      setState((){
+
+        if (response.containsKey('notifications')) {
+          if (response['notifications'].length > 0) {
+            if (pageNumber == 1) {
+              popular = response['popular'];
+            } else {
+              popular.addAll(response['popular']);
+            }
+          }else {
+            hasNextPage = false;
+          }
+        }
+      });
+    }catch(err){
+      setState(() {
+        isFirstLoadRunning = false;
+        isLoadMoreRunning = false;
+      });
+      //print(err);
+    }
     setState(() {
       isFirstLoadRunning = false;
       isLoadMoreRunning = false;

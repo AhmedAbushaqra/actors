@@ -22,7 +22,13 @@ class PopularWidget extends StatelessWidget {
       margin: const EdgeInsets.only(top: 7,right: 30,left: 30,bottom: 7),
       child: Padding(
         padding: const EdgeInsets.all(20),
-        child: SizedBox(),
+        child: SizedBox(
+          height: 70,
+          width: 70,
+          child: Center(
+            child: Text(popular.name!),
+          ),
+        ),
       ),
     );
   }

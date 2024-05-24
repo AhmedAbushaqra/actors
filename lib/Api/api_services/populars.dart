@@ -3,7 +3,7 @@ import '../api.dart';
 
 import '../../models/popular_model.dart';
 
-class Notifications{
+class Populars{
 
   Future<Map<String, dynamic>> get({int? page}) async {
 
@@ -22,7 +22,7 @@ class Notifications{
         }
       }
     }
-
+    print(result);
     result['popular'] = popularList;
     return result;
   }
