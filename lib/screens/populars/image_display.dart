@@ -1,8 +1,9 @@
-import 'package:flutter/material.dart';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:path_provider/path_provider.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'dart:io';
+import 'package:permission_handler/permission_handler.dart';
 
 class ImageDisplay extends StatefulWidget {
   final String image;
@@ -60,24 +61,37 @@ class _ImageDisplayState extends State<ImageDisplay> {
     );
   }
 
+  Future<void> requestPermission() async {
+    if (await Permission.storage.request().isGranted) {
+      print('Storage permission granted');
+    } else {
+      print('Storage permission denied');
+    }
+  }
+
   Future<void> fetchAndSaveImage(String url) async {
     setState(() {
       saving = true;
     });
     try {
+      await requestPermission();
       final response = await http.get(Uri.parse(url));
 
       if (response.statusCode == 200) {
-        final directory = await getApplicationDocumentsDirectory();
-        final path = '${directory.path}/downloaded_image.jpg';
+        final result = await ImageGallerySaver.saveImage(
+          Uint8List.fromList(response.bodyBytes),
+          quality: 60,
+          name: 'downloaded_image',
+        );
 
-        final file = File(path);
-        await file.writeAsBytes(response.bodyBytes);
-
-        print('Image saved to $path');
-        setState(() {
-          saved = true;
-        });
+        if (result['isSuccess']) {
+          print('Image saved to gallery');
+          setState(() {
+            saved = true;
+          });
+        } else {
+          throw Exception('Failed to save image to gallery');
+        }
       } else {
         throw Exception('Failed to load image');
       }
@@ -89,3 +103,4 @@ class _ImageDisplayState extends State<ImageDisplay> {
     });
   }
 }
+
