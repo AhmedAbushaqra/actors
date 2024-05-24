@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:actors/Api/api_services/populars.dart';
+import 'package:actors/common/shared_preferences.dart';
 import 'package:actors/models/popular_model.dart';
 import 'package:actors/screens/populars/popular_details_screen.dart';
 import 'package:flutter/material.dart';
@@ -82,6 +85,14 @@ class _PopularScreenState extends State<PopularScreen> {
     );
   }
 
+
+  Future<List<PopularModel>> getPopularListFromLocal() async {
+    List<String>? popularListJson = await getKeyAndListValueFromSharedPreferences('popular');
+
+      return popularListJson.map((data) => PopularModel.fromJson(jsonDecode(data))).toList();
+  }
+
+
   void getDataFunction (bool loadFirst) async{
     if (loadFirst == true){
       setState(() {
@@ -92,20 +103,23 @@ class _PopularScreenState extends State<PopularScreen> {
     }
     try{
       var response =  await Populars().get(page: pageNumber);
-      setState((){
-
+      var data = await getPopularListFromLocal();
         if (response.containsKey('popular')) {
           if (response['popular'].length > 0) {
             if (pageNumber == 1) {
               popular = response['popular'];
+              List<String> listJson = popular.map((data) => jsonEncode(data.toJson())).toList();
+              saveKeyAndListValueToSharedPreferences('popular', listJson);
             } else {
               popular.addAll(response['popular']);
+              List<String> listJson = popular.map((data) => jsonEncode(data.toJson())).toList();
+              saveKeyAndListValueToSharedPreferences('popular', listJson);
             }
           }else {
             hasNextPage = false;
           }
         }
-      });
+      setState((){});
     }catch(err){
       setState(() {
         isFirstLoadRunning = false;
