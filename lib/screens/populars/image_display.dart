@@ -54,7 +54,17 @@ class _ImageDisplayState extends State<ImageDisplay> {
 
           Image.network(
             "https://image.tmdb.org/t/p/w500/${widget.image}",
-            //fit: BoxFit.fill,
+            errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+              return ClipRRect(
+                borderRadius: BorderRadius.circular(15.0),
+                child: Image.asset(
+                  'assets/images/no-user.png',
+                  fit: BoxFit.fill,
+                  width: 58,
+                  height: 58,
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -83,7 +93,6 @@ class _ImageDisplayState extends State<ImageDisplay> {
           quality: 60,
           name: 'downloaded_image',
         );
-
         if (result['isSuccess']) {
           print('Image saved to gallery');
           setState(() {
