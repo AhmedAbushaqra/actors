@@ -24,13 +24,16 @@ class _ImageDisplayState extends State<ImageDisplay> {
                 onTap: (){
                   if(!saved){}
                 },
-                child: SizedBox(
-                  child: Row(
-                    children: [
-                      Text(saved?"Saved":"Save",style: const TextStyle(fontWeight: FontWeight.w900),),
-                      const SizedBox(width: 10,),
-                      Icon(saved?Icons.download_done:Icons.save,size: 28,),
-                    ],
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: SizedBox(
+                    child: Row(
+                      children: [
+                        Text(saved?"Saved":"Save",style: const TextStyle(fontWeight: FontWeight.w900),),
+                        const SizedBox(width: 10,),
+                        Icon(saved?Icons.download_done:Icons.save,size: 28,),
+                      ],
+                    ),
                   ),
                 ),
               ),

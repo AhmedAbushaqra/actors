@@ -1,4 +1,5 @@
 import 'package:actors/models/popular_model.dart';
+import 'package:actors/screens/populars/image_display.dart';
 import 'package:actors/screens/populars/widgets/popular_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -42,7 +43,9 @@ class _PopularDetailsScreenState extends State<PopularDetailsScreen> {
               itemCount: widget.popular.works!.length,
               itemBuilder: (context, index) {
                 return InkWell(
-                  onTap: (){},
+                  onTap: (){
+                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => ImageDisplay(image: "https://image.tmdb.org/t/p/w500/${widget.popular.works![index].workImage}",)));
+                  },
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(14),
                     child: Image.network(
