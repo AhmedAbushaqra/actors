@@ -23,10 +23,10 @@ class PopularWidget extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: SizedBox(
-          height: 70,
-          width: 70,
-          child: Center(
-            child: Text(popular.name!),
+          child: Column(
+            children: [
+              Text(popular.name!),
+            ],
           ),
         ),
       ),

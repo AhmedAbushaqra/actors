@@ -36,6 +36,10 @@ class _PopularScreenState extends State<PopularScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: const Color(0xffDFF1F8),
+        appBar: AppBar(
+          title: const Text("Popular People"),
+          centerTitle: true,
+        ),
         body: Column(
               children: [
                 Expanded(
@@ -84,8 +88,8 @@ class _PopularScreenState extends State<PopularScreen> {
       var response =  await Populars().get(page: pageNumber);
       setState((){
 
-        if (response.containsKey('notifications')) {
-          if (response['notifications'].length > 0) {
+        if (response.containsKey('popular')) {
+          if (response['popular'].length > 0) {
             if (pageNumber == 1) {
               popular = response['popular'];
             } else {
