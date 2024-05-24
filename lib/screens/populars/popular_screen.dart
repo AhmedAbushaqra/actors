@@ -1,5 +1,6 @@
 import 'package:actors/Api/api_services/populars.dart';
 import 'package:actors/models/popular_model.dart';
+import 'package:actors/screens/populars/popular_details_screen.dart';
 import 'package:flutter/material.dart';
 import 'widgets/popular_widget.dart';
 
@@ -54,8 +55,13 @@ class _PopularScreenState extends State<PopularScreen> {
                       controller: _controller,
                       itemCount: popular.length,
                       itemBuilder: (context, index) {
-                        return PopularWidget(
-                            popular: popular[index]
+                        return InkWell(
+                          onTap: (){
+                            Navigator.of(context).push(MaterialPageRoute(builder: (context) => PopularDetailsScreen(popular: popular[index])));
+                          },
+                          child: PopularWidget(
+                              popular: popular[index]
+                          ),
                         );
                       },
                     ),
