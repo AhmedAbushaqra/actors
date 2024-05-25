@@ -104,7 +104,8 @@ class _PopularScreenState extends State<PopularScreen> {
     }
     try{
       var connectivityResult = await (Connectivity().checkConnectivity());
-      if (connectivityResult == ConnectivityResult.mobile || connectivityResult == ConnectivityResult.wifi) {
+      if (connectivityResult.contains(ConnectivityResult.mobile)
+          || connectivityResult.contains(ConnectivityResult.wifi)) {
         var response =  await Populars().get(page: pageNumber);
         if (response.containsKey('popular')) {
           if (response['popular'].length > 0) {
@@ -121,7 +122,6 @@ class _PopularScreenState extends State<PopularScreen> {
             hasNextPage = false;
           }
         }
-        print('Connected to a mobile network');
       }else{
         var data = await getPopularListFromLocal();
         popular =data;
