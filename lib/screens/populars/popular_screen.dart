@@ -4,6 +4,7 @@ import 'package:actors/Api/api_services/populars.dart';
 import 'package:actors/common/shared_preferences.dart';
 import 'package:actors/models/popular_model.dart';
 import 'package:actors/screens/populars/popular_details_screen.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'widgets/popular_widget.dart';
 
@@ -102,8 +103,9 @@ class _PopularScreenState extends State<PopularScreen> {
       });
     }
     try{
-      var response =  await Populars().get(page: pageNumber);
-      var data = await getPopularListFromLocal();
+      var connectivityResult = await (Connectivity().checkConnectivity());
+      if (connectivityResult == ConnectivityResult.mobile || connectivityResult == ConnectivityResult.wifi) {
+        var response =  await Populars().get(page: pageNumber);
         if (response.containsKey('popular')) {
           if (response['popular'].length > 0) {
             if (pageNumber == 1) {
@@ -119,6 +121,11 @@ class _PopularScreenState extends State<PopularScreen> {
             hasNextPage = false;
           }
         }
+        print('Connected to a mobile network');
+      }else{
+        var data = await getPopularListFromLocal();
+        popular =data;
+      }
       setState((){});
     }catch(err){
       setState(() {
