@@ -3,9 +3,11 @@ import 'dart:convert';
 import 'package:actors/Api/api_services/populars.dart';
 import 'package:actors/common/shared_preferences.dart';
 import 'package:actors/models/popular_model.dart';
+import 'package:actors/providers/popular_provider.dart';
 import 'package:actors/screens/populars/popular_details_screen.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'widgets/popular_widget.dart';
 
 class PopularScreen extends StatefulWidget {
@@ -16,17 +18,14 @@ class PopularScreen extends StatefulWidget {
 }
 
 class _PopularScreenState extends State<PopularScreen> {
-  List<PopularModel> popular = [];
-  int pageNumber = 1;
-  bool hasNextPage = true;
-  bool isFirstLoadRunning = false;
-  bool isLoadMoreRunning = false;
+
   late ScrollController _controller;
-  bool showContainer = false;
 
   @override
   void initState() {
-    getDataFunction(true);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<PopularProvider>(context, listen: false).getDataFunction(true);;
+    });
     _controller = ScrollController()..addListener(_loadMore);
     super.initState();
   }
@@ -39,6 +38,7 @@ class _PopularScreenState extends State<PopularScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final popularProvider = Provider.of<PopularProvider>(context);
     return Scaffold(
         backgroundColor: const Color(0xffDFF1F8),
         appBar: AppBar(
@@ -49,36 +49,36 @@ class _PopularScreenState extends State<PopularScreen> {
               children: [
                 Expanded(
                   child: RefreshIndicator(
-                    onRefresh: refresh,
-                    child: isFirstLoadRunning
+                    onRefresh: popularProvider.refresh,
+                    child: popularProvider.isFirstLoadRunning
                         ? const Center(
                       child: CircularProgressIndicator(),
                     )
                         : ListView.builder(
                       padding: const EdgeInsets.only(bottom: 50),
                       controller: _controller,
-                      itemCount: popular.length,
+                      itemCount: popularProvider.popular.length,
                       itemBuilder: (context, index) {
                         return InkWell(
                           onTap: (){
-                            Navigator.of(context).push(MaterialPageRoute(builder: (context) => PopularDetailsScreen(popular: popular[index])));
+                            Navigator.of(context).push(MaterialPageRoute(builder: (context) => PopularDetailsScreen(popular: popularProvider.popular[index])));
                           },
                           child: PopularWidget(
-                              popular: popular[index]
+                              popular: popularProvider.popular[index]
                           ),
                         );
                       },
                     ),
                   ),
                 ),
-                if (isLoadMoreRunning)
+                if (popularProvider.isLoadMoreRunning)
                   const Padding(
                     padding: EdgeInsets.only(top: 10, bottom: 40),
                     child: Center(
                       child: CircularProgressIndicator(),
                     ),
                   ),
-                if (!hasNextPage)
+                if (!popularProvider.hasNextPage)
                   Container(),
               ],
             ),
@@ -86,81 +86,11 @@ class _PopularScreenState extends State<PopularScreen> {
     );
   }
 
-
-  Future<List<PopularModel>> getPopularListFromLocal() async {
-    List<String>? popularListJson = await getKeyAndListValueFromSharedPreferences('popular');
-
-      return popularListJson.map((data) => PopularModel.fromJson(jsonDecode(data))).toList();
-  }
-
-
-  void getDataFunction (bool loadFirst) async{
-    if (loadFirst == true){
-      setState(() {
-        hasNextPage = true;
-        isFirstLoadRunning = true;
-        pageNumber = 1;
-      });
+  _loadMore(){
+    if(_controller.position.extentAfter < 300){
+      Provider.of<PopularProvider>(context,listen: false).loadMore();
     }
-    try{
-      var connectivityResult = await (Connectivity().checkConnectivity());
-      if (connectivityResult.contains(ConnectivityResult.mobile)
-          || connectivityResult.contains(ConnectivityResult.wifi)) {
-        var response =  await Populars().get(page: pageNumber);
-        if (response.containsKey('popular')) {
-          if (response['popular'].length > 0) {
-            if (pageNumber == 1) {
-              popular = response['popular'];
-              List<String> listJson = popular.map((data) => jsonEncode(data.toJson())).toList();
-              saveKeyAndListValueToSharedPreferences('popular', listJson);
-            } else {
-              popular.addAll(response['popular']);
-              List<String> listJson = popular.map((data) => jsonEncode(data.toJson())).toList();
-              saveKeyAndListValueToSharedPreferences('popular', listJson);
-            }
-          }else {
-            hasNextPage = false;
-          }
-        }
-      }else{
-        var data = await getPopularListFromLocal();
-        popular =data;
-      }
-      setState((){});
-    }catch(err){
-      setState(() {
-        isFirstLoadRunning = false;
-        isLoadMoreRunning = false;
-      });
-      //print(err);
-    }
-    setState(() {
-      isFirstLoadRunning = false;
-      isLoadMoreRunning = false;
-    });
-
   }
-
-  Future refresh() async {
-    getDataFunction(true);
-  }
-
-  Future _loadMore() async {
-    if (
-    isFirstLoadRunning==false &&
-        isLoadMoreRunning==false &&
-        _controller.position.extentAfter < 300)
-    {
-      setState(() {
-        pageNumber += 1;
-        isLoadMoreRunning = true; // Display a progress indicator at the bottom
-      });
-      getDataFunction(false);
-    }
-
-  }
-
-
 
 }
 
